@@ -15,58 +15,96 @@ Pipelineで作成されるJSON,PDFは /modules/report_json/main.py に固定値�
 OncoStationで作成されるPDFはデータベースの report_version テーブルの値が反映されます。\
 → 必ずしも同じ値ではないことに留意してください。
  - 通常は以下のフォルダを検証用の解析フォルダとして使用する。\
-   CAPサーバ： /data1/data/result/[analysis type]/Validation/[version] \
-   開発サーバ： /data1/data/result/[analysis type]/[version]
+   CAPサーバ： /data1/data/result/[analysis type]/Validation/[new version] \
+   開発サーバ： /data1/data/result/[analysis type]/[new version]
 
 ## 1\. 検体の準備
 <details>
   <summary> 
-    詳細
+    Detail
   </summary>
 
-sshクライアントからgxd_pipelineユーザーでログインし、検証に使用する検体のfastq.gzの存在を確認する。
-<img src="https://github.com/user-attachments/assets/fa699745-c0ed-4b07-a3f0-18af9aaaf471" width="500"> \
+1-1. sshクライアントからgxd_pipelineユーザーでログインし、検証に使用する検体のfastq.gzの存在を確認する。\
+<img src="https://github.com/user-attachments/assets/fec5ee81-0350-4e41-8d55-316b051762c6" width="500"> \
+① batch name ② sample ID \
+ファイルがない場合は、BackUpサーバを確認する。 ※CAPサーバのみ \
+<img src="https://github.com/user-attachments/assets/ad7912f6-846e-4877-8722-54549a969045" width="500"> \
 ① batch name ② sample ID 
 
-ファイルがない場合は、CAPサーバーまたはBackUpサーバーからコピーする。\
-CAPサーバの場合:
-```
-rsync -avzru /data2/backup/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
-```
-開発サーバの場合:
+ファイルがない場合は、CAPサーバまたはBackUpサーバからコピーする。※開発サーバのみ 
 ```
 rsync -avzru gxd_pipeline@192.168.9.100:/data1/data/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 rsync -avzru gxd_pipeline@192.168.9.100:/data2/backup/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 ```
-Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。\
+
+1-2. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。\
 CAPサーバの場合:
 ```
-mkdir -p /data1/data/result/[analysis type]/Validation/[version]/[sample ID]/Fastq
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[version]/[sample ID]/Fastq/
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[version]/[sample ID]/Fastq/
+mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/
+```
+fastq.gzがBuckUpサーバに異動していた場合:
+```
+mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq
+ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/
+ln -s /data1/backup/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/
 ```
 開発サーバの場合:
 ```
-mkdir -p /data1/data/result/[analysis type]/[version]/[sample ID]/Fastq
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/[version]/[sample ID]/Fastq/
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/[version]/[sample ID]/Fastq/
+mkdir -p /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq/
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq/
 ```
 eWESの場合はリンクファイル名が元ファイルと異なることに注意。
 CAPサーバの場合:
 ```
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
+```
+fastq.gzがBuckUpサーバに異動していた場合:
+```
+ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
+ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
 ```
 開発サーバの場合:
 ```
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/[version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/[version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
-```
-解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
-```
-vi /data1/data/result/[analysis type]/[batch name]/[sample ID]/run.sh
-source /data1/iGeniPipe/miniconda3/bin/activate cs && 
-snakemake --snakefile /data1/[analysis type]/version/[version]/workflow/Snakefile --directory /data1/GxD --profile /data1/[analysis type]/version/[version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/eWES/20250527_LH00432_0059_B22YVM3LT3' & 
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
 ```
 
+1-3. 解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
+CAPサーバの場合:
+```
+vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
+source /data1/iGeniPipe/miniconda3/bin/activate cs && 
+snakemake --snakefile /data1/GxD_[analysis type]/version/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/version/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]' & 
+```
+fastq.gzがBuckUpサーバに異動していた場合: \
+snakemake 実行時にオプションを追加する。
+```
+vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
+source /data1/iGeniPipe/miniconda3/bin/activate cs && 
+snakemake --singularity-args '--bind /data2:/data2 --bind /data1:/data1’ --snakefile /data1/GxD_[analysis type]/version/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/version/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]' & 
+```
+開発サーバの場合:
+```
+vi /data1/data/result/[analysis type]/[new version]/[sample ID]/run.sh
+source /data1/iGeniPipe/miniconda3/bin/activate cs && 
+snakemake --snakefile /data1/GxD_[analysis type]/version/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/version/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/[new version]' & 
+```
+</details>
+
+## 2\. 検証するパイプラインのインストール
+<details>
+  <summary> 
+    Detail
+  </summary>
+
+2-1. sshクライアントからgxd_pipelineユーザーでログインし、Bitbucket からソースコードをダウンロードする。\
+2-2. パイプラインのソースコード置き場（/data1/GxD_[analysis type]/version/）の下に移動させてフォルダ名を適宜付与する。\
+2-3. containers フォルダを削除する。\
+2-4. 親ディレクトリの containers フォルダのシンボリックリンクを作成する。\
+　（コンテナファイルに変更がある場合は適宜変更する）
+ 
 </details>
