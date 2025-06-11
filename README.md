@@ -78,20 +78,20 @@ CAPサーバの場合:
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
 source /data1/iGeniPipe/miniconda3/bin/activate cs && 
-snakemake --snakefile /data1/GxD_[analysis type]/version/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/version/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]' & 
+snakemake --snakefile /data1/GxD_[analysis type]/versions/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/versions/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]' & 
 ```
 fastq.gzがBuckUpサーバに異動していた場合: \
 snakemake 実行時にオプションを追加する。
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
 source /data1/iGeniPipe/miniconda3/bin/activate cs && 
-snakemake --singularity-args '--bind /data2:/data2 --bind /data1:/data1’ --snakefile /data1/GxD_[analysis type]/version/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/version/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]' & 
+snakemake --singularity-args '--bind /data2:/data2 --bind /data1:/data1’ --snakefile /data1/GxD_[analysis type]/versions/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/versions/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]' & 
 ```
 開発サーバの場合:
 ```
 vi /data1/data/result/[analysis type]/[new version]/[sample ID]/run.sh
 source /data1/iGeniPipe/miniconda3/bin/activate cs && 
-snakemake --snakefile /data1/GxD_[analysis type]/version/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/version/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/[new version]' & 
+snakemake --snakefile /data1/GxD_[analysis type]/versions/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/versions/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/[new version]' & 
 ```
 </details>
 
@@ -101,8 +101,17 @@ snakemake --snakefile /data1/GxD_[analysis type]/version/[new version]/workflow/
     Detail
   </summary>
 
-2-1. sshクライアントからgxd_pipelineユーザーでログインし、Bitbucket からソースコードをダウンロードする。\
-2-2. パイプラインのソースコード置き場（/data1/GxD_[analysis type]/version/）の下に移動させてフォルダ名を適宜付与する。\
+2-1. sshクライアントからgxd_pipelineユーザーでログインし、Bitbucket からソースコードをダウンロードする。
+```
+git clone -b dev git@bitbucket.org:geninus/gxd_ewes.git
+git clone -b dev git@bitbucket.org:geninus/gxd_wts.git
+```
+※ -b dev オプションで dev branch のコードをDLする。main branch の場合はオプション不要 \
+2-2. パイプラインのソースコード置き場（/data1/GxD_[analysis type]/versions/）の下に移動させてフォルダ名を適宜付与する。\
+```
+mv gxd_ewes /data1/GxD_eWES/versions/[new version]
+mv gxd_wts /data1/GxD_WTS/versions/[new version]
+```
 2-3. containers フォルダを削除する。\
 2-4. 親ディレクトリの containers フォルダのシンボリックリンクを作成する。\
 　（コンテナファイルに変更がある場合は適宜変更する）
