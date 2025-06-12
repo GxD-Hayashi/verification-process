@@ -150,6 +150,8 @@ ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
 ```
 cd /data1/data/result/[analysis type]/Validation/[new version]/[sample ID] && sh run.sh
 ```
+### 4-2\. 解析結果をまとめる
+
 </details>
 
 ## 5\. 現行バージョンでの解析 *必要に応じて実施
