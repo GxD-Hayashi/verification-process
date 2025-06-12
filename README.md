@@ -229,7 +229,7 @@ singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/r
 **すべての検体の解析が終了したことを確認したのち、変更したスクリプトファイルを元に戻しておく。**
 
 ## 6\. パイプラインのアップデート
-検証合格後、検証計画書と検証報告書を作成してTS,LDの承認を得たら、パイプラインをアップデートする。
+TS,LDの承認を得て検証の合格が確定したら、パイプラインをアップデートする。
 <details>
   <summary> 
     Detail
