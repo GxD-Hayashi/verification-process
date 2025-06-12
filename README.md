@@ -159,7 +159,7 @@ singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/r
 ⇒ /data1/data/result/[analysis type]/Validation/[new version]/summarized.xlsx が作成される。
 </details>
 
-## 5\. 現行バージョンでの解析 *必要に応じて実施
+## 5\. 現行バージョンでの解析（必要に応じて実施）
 検証に用いる検体が現行バージョンで解析されたものではない場合、新旧パイプラインの解析結果を比較するために現行バージョンのパイプラインでも解析を行う。\
 データベースの更新を防ぐためにパイプラインを一部変更して実行する必要があるので、**検査がない期間に実施する**こと。
 <details>
@@ -224,12 +224,12 @@ cd /data1/data/result/[analysis type]/[new version]/[current version]/[sample ID
 singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/result/[analysis type]/Validation/[new version]/[current version]/post_process.py
 ```
 ⇒ /data1/data/result/[analysis type]/Validation/[new version]/[current version]/summarized.xlsx が作成される。
+**変更したスクリプトファイルは必ず元に戻しておくこと。**
 </details>
 
-**すべての検体の解析が終了したことを確認したのち、変更したスクリプトファイルを元に戻しておく。**
-
 ## 6\. パイプラインのアップデート
-TS,LDの承認を得て検証の合格が確定したら、パイプラインをアップデートする。
+TS,LDの承認を得て検証の合格が確定したら、パイプラインをアップデートする。\
+**3-1, 3-2, 5-4 で変更したスクリプトファイルを元に戻したことを確認しておくこと。**
 <details>
   <summary> 
     Detail
