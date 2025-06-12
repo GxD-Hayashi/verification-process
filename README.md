@@ -6,15 +6,15 @@
 　（すべての検体で起こるわけではありません）
  - 開発サーバーで検証する際は、臨床検体を使用せず、標準物質またはCAP PT検体等を使用すること。\
 　（セキュリティ面で安全が担保できていません）
- - 検証スクリプトのダウンロード(git clone)や解析の実行は gxd_pipeline ユーザーで実施してください。\
-データのコピーやbashファイルの作成等は他のユーザーでも問題ないですが、gxd_pipelineユーザーに閲覧・実行権限を付与しておいてください。
- - CAPサーバーでの検証は、やむを得ない場合を除き、現行のパイプラインが稼働しているときには行わないこと。\
-リソースが限られているため。また**改修内容によっては仕様と異なるリファレンスファイルを参照するので**、想定した検証ができない可能性があります。
+ - 検証スクリプトのダウンロード(git clone)や解析の実行は **gxd_pipeline ユーザーで実施**してください。\
+　データのコピーやbashファイルの作成等は他のユーザーでも問題ないですが、gxd_pipelineユーザーに閲覧・実行権限を付与しておいてください。
+ - CAPサーバーでの検証は、やむを得ない場合を除き、**現行のパイプラインが稼働しているときには行わない**こと。\
+　**改修内容によっては仕様と異なるリファレンスファイルを参照するので**、想定した検証ができない可能性があります。
  - レポートの「Additional Information」項目のバージョン値について\
-Pipelineで作成されるJSON,PDFは /modules/report_json/main.py に固定値で記載されている値が反映されます。\
-OncoStationで作成されるPDFはデータベースの report_version テーブルの値が反映されます。\
-→ 必ずしも同じ値ではないことに留意してください。
- - 通常は以下のフォルダを検証用の解析フォルダとして使用する。\
+　Pipelineで作成されるJSON,PDFは /modules/report_json/main.py に固定値で記載されている値が反映されます。\
+　OncoStationで作成されるPDFはデータベースの report_version テーブルの値が反映されます。\
+　→ 必ずしも同じ値ではないことに留意してください。
+ - 通常は以下のフォルダを検証用の解析フォルダとして使用してください。\
    CAPサーバ： /data1/data/result/[analysis type]/Validation/[new version] \
    開発サーバ： /data1/data/result/[analysis type]/[new version]
 
@@ -72,6 +72,8 @@ ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/resu
 ```
 
 #### 1-3\. 解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
+1検体毎にrun.shを作成した場合、解析の実行も1検体毎に実施することになるので、\
+複数の検体の実行コマンドをまとめて1つの run.sh を作成しても構いません。\
 CAPサーバの場合:
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
@@ -79,7 +81,7 @@ source /data1/iGeniPipe/miniconda3/bin/activate cs &&
 snakemake --snakefile /data1/GxD_[analysis type]/versions/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/versions/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]' & 
 ```
 fastq.gzがBuckUpサーバに異動していた場合: \
-snakemake 実行時にオプションを追加する。
+snakemake 実行時のオプションを追加する。
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
 source /data1/iGeniPipe/miniconda3/bin/activate cs && 
@@ -124,6 +126,7 @@ ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
 </details>
 
 ## 3\. 検証するパイプラインの修正
+初回解析時のデータや、データベースに登録済みの解析結果を変更しないよう、コードを一時的に変更する。
 <details>
   <summary> 
     Detail
@@ -158,7 +161,7 @@ cd /data1/data/result/[analysis type]/Validation/[new version]/[sample ID] && sh
   </summary>
 
 #### 5-1\. 解析の準備
-検証用の解析フォルダの下に現行バージョンの解析フォルダをFastqを含めて作成する。\
+検証用の解析フォルダの下に、現行バージョンの解析フォルダをFastqを含めて作成する。\
 &nbsp;&nbsp;&nbsp;&nbsp; CAPサーバ： /data1/data/result/[analysis type]/Validation/[new version]/[current version] \
 &nbsp;&nbsp;&nbsp;&nbsp; 開発サーバ： /data1/data/result/[analysis type]/[new version]/[current version]
 CAPサーバの場合:
@@ -170,8 +173,10 @@ mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[current ve
 mkdir -p /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq
 ```
 #### 5-2\. fastq.gzのシンボリックリンクを作成する。
-リンク元のファイルは 1-1.で確認したものを使用。リンクの作成は 1-2.を参照。
+リンク元のファイルは 1-1.で確認したものを使用。リンクの作成コマンドは 1-2.を参照。
 #### 5-3\. 解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
+1検体毎にrun.shを作成した場合、解析の実行も1検体毎に実施することになるので、\
+複数の検体の実行コマンドをまとめて1つの run.sh を作成しても構いません。\
 CAPサーバの場合:
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/run.sh
@@ -211,10 +216,24 @@ cd /data1/data/result/[analysis type]/[new version]/[current version]/[sample ID
 **すべての検体の解析が終了したことを確認したのち、変更したスクリプトファイルを元に戻しておく。**
 
 ## 6\. パイプラインのアップデート
+検証合格後、検証計画書と検証報告書を作成してTS,LDの承認を得たら、パイプラインをアップデートする。
 <details>
   <summary> 
     Detail
   </summary>
 
+#### 6-1\. 新バージョンのPipelineスクリプトの確認
+パイプラインフォルダの直下にある .pipeline ファイルに記載のバージョンが、アップデート後のバージョンであることを確認する。
+（この値がレポート最終頁のパイプラインバージョンに反映されます）
+```
+$ cat /data1/GxD_eWES/versions/[new version]/.pipeline
+VERSION=[new version]
+```
+#### 6-2\. シンボリックリンクの差し替え
+/data1/GxD_[analysis type]/Pipeline を一度削除してから新たなシンボリックリンクを作成する。
+```
+rm /data1/GxD_[analysis type]/Pipeline
+ln -s /data1/GxD_[analysis type]/versions/[new version] /data1/GxD_[analysis type]/Pipeline
+```
 
 </details>
