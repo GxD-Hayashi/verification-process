@@ -151,7 +151,12 @@ ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
 cd /data1/data/result/[analysis type]/Validation/[new version]/[sample ID] && sh run.sh
 ```
 ### 4-2\. 解析結果をまとめる
-
+全ての検体で解析完了が確認できたら、解析結果をまとめて1つのExcelファイルに書き出す。\
+同じ階層にあるサンプル毎の解析フォルダにアクセスし、summarized.*.tsv を読み込んで集約するスクリプト post_process.py を検証フォルダにコピーし、実行する。
+```
+singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/result/[analysis type]/Validation/[new version]/post_process.py
+```
+⇒ /data1/data/result/[analysis type]/Validation/[new version]/summarized.xlsx が作成される。
 </details>
 
 ## 5\. 現行バージョンでの解析 *必要に応じて実施
@@ -203,7 +208,6 @@ snakemake --snakefile /data1/GxD_[analysis type]/versions/[current version]/work
 ※ データベースの更新をしないようにするための処理。3-1. を参照。\
 */[new version]/workflow/configs/files.py の self.report_pdf を修正してPDFレポートの出力先を変更する。**（開発サーバのみ）**\
 ※ APIでレポートを作成するとCAPサーバーに出力されるので、上書きしないように任意のファイルパスを指定する。3-2.を参照。
-
 #### 5-5\. 解析の実行
 CAPサーバの場合:
 ```
@@ -213,6 +217,13 @@ cd /data1/data/result/[analysis type]/Validation/[new version]/[current version]
 ```
 cd /data1/data/result/[analysis type]/[new version]/[current version]/[sample ID] && sh run.sh
 ```
+### 5-6\. 解析結果をまとめる
+全ての検体で解析完了が確認できたら、解析結果をまとめて1つのExcelファイルに書き出す。\
+同じ階層にあるサンプル毎の解析フォルダにアクセスし、summarized.*.tsv を読み込んで集約するスクリプト post_process.py を検証フォルダにコピーし、実行する。
+```
+singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/result/[analysis type]/Validation/[new version]/[current version]/post_process.py
+```
+⇒ /data1/data/result/[analysis type]/Validation/[new version]/[current version]/summarized.xlsx が作成される。
 </details>
 
 **すべての検体の解析が終了したことを確認したのち、変更したスクリプトファイルを元に戻しておく。**
