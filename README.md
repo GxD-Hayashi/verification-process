@@ -131,6 +131,7 @@ ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
     Detail
   </summary>
 
+<a id="3-1"></a>
 #### 3-1\. */[new version]/workflow/layer/summarize.smk: report_json rule のuploadオプションをFalseに変更する。
 ※ データベースの更新をしないようにするための処理。\
 <img src="https://github.com/user-attachments/assets/42610d69-97ff-4df7-8e06-9c170c3a7b35" width="400"> 
@@ -160,45 +161,19 @@ cd /data1/data/result/[analysis type]/Validation/[new version]/[sample ID] && sh
   </summary>
 
 #### 5-1\. 解析の準備
-検証用の解析フォルダの下に現行バージョンの解析フォルダを作成する。\
+検証用の解析フォルダの下に現行バージョンの解析フォルダをFastqを含めて作成する。\
 &nbsp;&nbsp;&nbsp;&nbsp; CAPサーバ： /data1/data/result/[analysis type]/Validation/[new version]/[current version] \
 &nbsp;&nbsp;&nbsp;&nbsp; 開発サーバ： /data1/data/result/[analysis type]/[new version]/[current version]
-
-#### 5-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。
 CAPサーバの場合:
 ```
 mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/Fastq
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/Fastq/
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/Fastq/
-```
-fastq.gzがBuckUpサーバに異動していた場合:
-```
-mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/Fastq
-ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/Fastq/
-ln -s /data1/backup/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/Fastq/
 ```
 開発サーバの場合:
 ```
 mkdir -p /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/[new version]/[current version]/[sample ID]/Fastq/
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/[new version]/[current version]/[sample ID]/Fastq/
 ```
-eWESの場合はリンクファイル名が元ファイルと異なることに注意。\
-CAPサーバの場合:
-```
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
-```
-fastq.gzがBuckUpサーバに異動していた場合:
-```
-ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
-ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
-```
-開発サーバの場合:
-```
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/[new version]/[current version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/[new version]/[current version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
-```
+#### 5-2\. fastq.gzのシンボリックリンクを作成する。
+リンク元のファイルは[1-1.](#1-1)で確認したものを使用。リンクの作成は[1-2.](#1-2)を参照。
 #### 5-3\. 解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
 CAPサーバの場合:
 ```
@@ -221,9 +196,9 @@ snakemake --snakefile /data1/GxD_[analysis type]/versions/[current version]/work
 ```
 #### 5-4\. パイプラインの修正
 */[current version]/workflow/layer/summarize.smk: report_json rule のuploadオプションをFalseに変更する。\
-※ データベースの更新をしないようにするための処理。3-1.を参照。\
+※ データベースの更新をしないようにするための処理。[3-1.](#3-1)を参照。\
 */[new version]/workflow/configs/files.py の self.report_pdf を修正してPDFレポートの出力先を変更する。**（開発サーバのみ）**\
-※ APIでレポートを作成するとCAPサーバーに出力されるので、上書きしないように任意のファイルパスを指定する。3-2.を参照。
+※ APIでレポートを作成するとCAPサーバーに出力されるので、上書きしないように任意のファイルパスを指定する。[3-2.](#3-2)を参照。
 
 #### 5-5\. 解析の実行
 CAPサーバの場合:
