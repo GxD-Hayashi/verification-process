@@ -23,23 +23,21 @@ OncoStationで作成されるPDFはデータベースの report_version テー�
   <summary> 
     Detail
   </summary>
-
-#### 1-1\. sshクライアントからgxd_pipelineユーザーでログインし、検証に使用する検体のfastq.gzの存在を確認する。
+ 
 <a id="1-1"></a>
+#### 1-1\. sshクライアントからgxd_pipelineユーザーでログインし、検証に使用する検体のfastq.gzの存在を確認する。
 <img src="https://github.com/user-attachments/assets/fec5ee81-0350-4e41-8d55-316b051762c6" width="500"> \
 ① batch name ② sample ID \
 ファイルがない場合は、BackUpサーバを確認する。 ※CAPサーバのみ \
 <img src="https://github.com/user-attachments/assets/ad7912f6-846e-4877-8722-54549a969045" width="500"> \
-① batch name ② sample ID 
-
+① batch name ② sample ID \
 ファイルがない場合は、CAPサーバまたはBackUpサーバからコピーする。※開発サーバのみ 
 ```
 rsync -avzru gxd_pipeline@192.168.9.100:/data1/data/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 rsync -avzru gxd_pipeline@192.168.9.100:/data2/backup/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 ```
-
-#### 1-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。
 <a id="1-2"></a>
+#### 1-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。
 CAPサーバの場合:
 ```
 mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq
@@ -133,12 +131,12 @@ ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
     Detail
   </summary>
 
-#### 3-1\. */[new version]/workflow/layer/summarize.smk: report_json rule のuploadオプションをFalseに変更する。
 <a id="3-1"></a>
+#### 3-1\. */[new version]/workflow/layer/summarize.smk: report_json rule のuploadオプションをFalseに変更する。
 ※ データベースの更新をしないようにするための処理。\
 <img src="https://github.com/user-attachments/assets/42610d69-97ff-4df7-8e06-9c170c3a7b35" width="400"> 
-#### 3-2\. */[new version]/workflow/configs/files.py の self.report_pdf を修正してPDFレポートの出力先を変更する。（開発サーバのみ）
 <a id="3-2"></a>
+#### 3-2\. */[new version]/workflow/configs/files.py の self.report_pdf を修正してPDFレポートの出力先を変更する。（開発サーバのみ）
 ※ APIでレポートを作成するとCAPサーバーに出力されるので、上書きしないように任意のファイルパスを指定する。\
 <img src="https://github.com/user-attachments/assets/4a04bc67-e6af-4b71-8a73-29752132f98e" width="500"> 
 </details>
