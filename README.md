@@ -7,18 +7,18 @@
  - 開発サーバーで検証する際は、臨床検体を使用せず、標準物質またはCAP PT検体等を使用すること。\
 　（セキュリティ面で安全が担保できていません）
  - 検証スクリプトのダウンロード(git clone)や解析の実行は **gxd_pipeline ユーザーで実施**してください。\
-　データのコピーやbashファイルの作成等は他のユーザーでも問題ないですが、gxd_pipelineユーザーに閲覧・実行権限を付与しておいてください。
+　fastq.gz のコピーやbashファイルの作成等は他のユーザーでも問題ないですが、gxd_pipelineユーザーに閲覧・実行権限を付与しておいてください。
  - CAPサーバーでの検証は、やむを得ない場合を除き、**現行のパイプラインが稼働しているときには行わない**こと。\
 　**改修内容によっては仕様と異なるリファレンスファイルを参照するので**、想定した検証ができない可能性があります。
  - レポートの「Additional Information」項目のバージョン値について\
 　Pipelineで作成されるJSON,PDFは /modules/report_json/main.py に固定値で記載されている値が反映されます。\
 　OncoStationで作成されるPDFはデータベースの report_version テーブルの値が反映されます。\
-　→ 必ずしも同じ値ではないことに留意してください。
- - 通常は以下のフォルダを検証用の解析フォルダとして使用してください。\
-   CAPサーバ： /data1/data/result/[analysis type]/Validation/[new version] \
-   開発サーバ： /data1/data/result/[analysis type]/[new version]
+　→ Pipelineの検証ではOncoStationで作成されるPDFファイル(=レポートシステムにuploadされる報告書)の検証はできません。
 
 ## 1\. 検体の準備
+通常は以下のフォルダを検証用の解析フォルダとして使用してください。\
+&ensp;&ensp;&ensp; CAPサーバ： /data1/data/result/[analysis type]/Validation/[new version] \
+&ensp;&ensp;&ensp; 開発サーバ： /data1/data/result/[analysis type]/[new version]
 <details>
   <summary> 
     Detail
@@ -248,5 +248,7 @@ VERSION=[new version]
 rm /data1/GxD_[analysis type]/Pipeline
 ln -s /data1/GxD_[analysis type]/versions/[new version] /data1/GxD_[analysis type]/Pipeline
 ```
-
+#### 6-3\. データベースに登録されているバージョン情報の更新
+OncoStationで作成されるPDFファイル(=レポートシステムにuploadされる報告書)の「Additional Information」項目が新Pipelineの情報と一致するよう、
+データベースに登録されているレポートバージョンの更新をGSからITチームに指示するよう依頼する。(変更がない場合は依頼しなくてよいです)
 </details>
