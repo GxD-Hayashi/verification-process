@@ -10,10 +10,10 @@
 　fastq.gz のコピーやbashファイルの作成等は他のユーザーでも問題ないですが、gxd_pipelineユーザーに閲覧・実行権限を付与しておいてください。
  - CAPサーバーでの検証は、やむを得ない場合を除き、**現行のパイプラインが稼働しているときには行わない**こと。\
 　**改修内容によっては仕様と異なるリファレンスファイルを参照するので**、想定した検証ができない可能性があります。
- - レポートの「Additional Information」項目のバージョン値について\
-　Pipelineで作成されるJSON,PDFは /modules/report_json/main.py に固定値で記載されている値が反映されます。\
-　OncoStationで作成されるPDFはデータベースの report_version テーブルの値が反映されます。\
-　→ Pipelineの検証ではOncoStationで作成されるPDFファイル(=レポートシステムにuploadされる報告書)の検証はできません。
+ - レポートの「Additional Information」項目のバージョン値は以下の値が反映されます。\
+&ensp;&ensp; Pipeline: スクリプトファイルに固定値として記載されている値\
+&ensp;&ensp; OncoStation: データベースの report_version テーブルの値\
+⇒ Pipelineの検証ではOncoStationで作成されるPDFファイル(=レポートシステムにuploadされる報告書)の検証はできません。
 
 ## 1\. 検体の準備
 通常は以下のフォルダを検証用の解析フォルダとして使用してください。\
