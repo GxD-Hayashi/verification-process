@@ -244,7 +244,7 @@ TS,LDの承認を得て検証の合格が確定したら、パイプラインを
   </summary>
 
 #### 6-1\. 新バージョンのPipelineスクリプトの確認
-パイプラインフォルダの直下にある .pipeline ファイルに記載のバージョンが、アップデート後のバージョンであることを確認する。（この値がレポート最終頁のパイプラインバージョンに反映されます）
+パイプラインフォルダの直下にある .pipeline ファイルに記載のバージョンが、アップデート後のバージョンであることを確認する。（この値がパイプラインレポート最終頁のパイプラインバージョンに反映されます）
 ```
 $ cat /data1/GxD_eWES/versions/[new version]/.pipeline
 VERSION=[new version]
@@ -256,5 +256,5 @@ rm /data1/GxD_[analysis type]/Pipeline
 ln -s /data1/GxD_[analysis type]/versions/[new version] /data1/GxD_[analysis type]/Pipeline
 ```
 #### 6-3\. データベースに登録されているバージョン情報の更新
-OncoStationで作成されるPDFファイル(=レポートシステムにuploadされる報告書)の「Additional Information」項目が新Pipelineの情報と一致するよう、データベースに登録されているレポートバージョンの更新をGSからITチームに指示するよう依頼する。(変更がない場合は依頼しなくてよいです)
+OncoStationで作成されるPDFファイル(=レポートシステムにuploadされる報告書)の「Additional Information」項目が新Pipelineの情報と一致するよう、データベースに登録されているレポートバージョンの更新をGSからITチームに指示するよう依頼する。(変更がない場合は依頼しなくてよい)
 </details>
