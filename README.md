@@ -1,15 +1,10 @@
 # 検証手順
 ## 0\. 検証計画時の注意点
- - OncoStationに未登録の検体を使用するとPDFレポートの作成ができません。\
-　（rule: report_json 実行時、DBにアクセスして検体情報を検索する際に、登録情報がなくエラー終了するため）
- - 開発サーバーで解析を行うと、API通信制限のためか、PDFが作成されないことがあります。\
-　（すべての検体で起こるわけではありません）
- - 開発サーバーで検証する際は、臨床検体を使用せず、標準物質またはCAP PT検体等を使用すること。\
-　（セキュリティ面で安全が担保できていません）
- - 検証スクリプトのダウンロード(git clone)や解析の実行は **gxd_pipeline ユーザーで実施**してください。\
-　fastq.gz のコピーやbashファイルの作成等は他のユーザーでも問題ないですが、gxd_pipelineユーザーに閲覧・実行権限を付与しておいてください。
- - CAPサーバーでの検証は、やむを得ない場合を除き、**現行のパイプラインが稼働しているときには行わない**こと。\
-　**改修内容によっては仕様と異なるリファレンスファイルを参照するので**、想定した検証ができない可能性があります。
+ - OncoStationに未登録の検体を使用するとPDFレポートの作成ができません。（rule: report_json 実行時、DBにアクセスして検体情報を検索する際に、登録情報がなくエラー終了するため）
+ - 開発サーバーで解析を行うと、API通信制限のためか、PDFが作成されないことがあります。（すべての検体で起こるわけではありません）
+ - 開発サーバーで検証する際は、臨床検体を使用せず、標準物質またはCAP PT検体等を使用すること。（セキュリティ面で安全が担保できていません）
+ - 検証スクリプトのダウンロード(git clone)や解析の実行は **gxd_pipeline ユーザーで実施**してください。fastq.gz のコピーやbashファイルの作成等は他のユーザーでも問題ないですが、gxd_pipelineユーザーに閲覧・実行権限を付与しておいてください。
+ - CAPサーバーでの検証は、やむを得ない場合を除き、**現行のパイプラインが稼働しているときには行わない**こと。**改修内容によっては仕様と異なるリファレンスファイルを参照するので**、想定した検証ができない可能性があります。
  - レポートの「Additional Information」項目のバージョン値は以下の値が反映されます。\
 &ensp;&ensp; Pipeline: スクリプトファイルに固定値として記載されている値\
 &ensp;&ensp; OncoStation: データベースの report_version テーブルの値\
@@ -36,44 +31,44 @@ rsync -avzru gxd_pipeline@192.168.9.100:/data1/data/NovaseqX/[batch name]/[sampl
 rsync -avzru gxd_pipeline@192.168.9.100:/data2/backup/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 ```
 #### 1-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。
+WTSの場合は、リンクファイル名と元ファイル名は同じ。\
 CAPサーバの場合:
 ```
 mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/WTS/Validation/[new version]/[sample ID]/Fastq/
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/WTS/Validation/[new version]/[sample ID]/Fastq/
 ```
 fastq.gzがBuckUpサーバに異動していた場合:
 ```
 mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq
-ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/
-ln -s /data1/backup/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/
+ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/WTS/Validation/[new version]/[sample ID]/Fastq/
+ln -s /data1/backup/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/WTS/Validation/[new version]/[sample ID]/Fastq/
 ```
 開発サーバの場合:
 ```
 mkdir -p /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq/
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq/
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/WTS/[new version]/[sample ID]/Fastq/
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/WTS/[new version]/[sample ID]/Fastq/
 ```
-eWESの場合はリンクファイル名が元ファイルと異なることに注意。\
+**※ eWESの場合はリンクファイル名が元ファイルと異なることに注意。**\
 CAPサーバの場合:
 ```
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/eWES/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/eWES/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
 ```
 fastq.gzがBuckUpサーバに異動していた場合:
 ```
-ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
-ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
+ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/eWES/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
+ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/eWES/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
 ```
 開発サーバの場合:
 ```
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
-ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/eWES/[new version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
+ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/eWES/[new version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
 ```
 
 #### 1-3\. 解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
-1検体毎にrun.shを作成した場合、解析の実行も1検体毎に実施することになるので、\
-複数の検体の実行コマンドをまとめて1つの run.sh を作成しても構いません。\
+1検体毎にrun.shを作成した場合、解析の実行も1検体毎に実施することになるので、複数の検体の実行コマンドをまとめて1つの run.sh を作成しても構いません。\
 CAPサーバの場合:
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
@@ -118,7 +113,7 @@ rm -rf /data1/GxD_eWES/versions/[new version]/containers
 rm -rf /data1/GxD_WTS/versions/[new version]/containers
 ```
 #### 2-4\. 親ディレクトリの containers フォルダのシンボリックリンクを作成する。
-※ コンテナファイルに変更がある場合は適宜変更する
+※ Pipelineの改修に伴い、コンテナファイルに変更がある場合は適宜変更する
 ```
 ln -s /data1/GxD_eWES/containers /data1/GxD_eWES/versions/[new version]/
 ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
@@ -126,7 +121,7 @@ ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
 </details>
 
 ## 3\. 検証するパイプラインの修正
-初回解析時のデータや、データベースに登録済みの解析結果を変更しないよう、コードを一時的に変更する。
+初回解析時に作成されたファイルや、データベースに登録済みの解析結果を変更しないよう、コードを一時的に変更する。
 <details>
   <summary> 
     Detail
@@ -150,13 +145,22 @@ ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
 ```
 cd /data1/data/result/[analysis type]/Validation/[new version]/[sample ID] && sh run.sh
 ```
+開発サーバの場合
+```
+cd /data1/data/result/[analysis type]/[new version]/[sample ID] && run.sh
+```
 ### 4-2\. 解析結果をまとめる
 全ての検体で解析完了が確認できたら、解析結果をまとめて1つのExcelファイルに書き出す。\
 同じ階層にあるサンプル毎の解析フォルダにアクセスし、summarized.*.tsv を読み込んで集約するスクリプト post_process.py を検証フォルダにコピーし、実行する。
 ```
 singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/result/[analysis type]/Validation/[new version]/post_process.py
 ```
-⇒ /data1/data/result/[analysis type]/Validation/[new version]/summarized.xlsx が作成される。
+⇒ /data1/data/result/[analysis type]/Validation/[new version]/summarized.xlsx が作成される。\
+開発サーバの場合
+```
+singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/result/[analysis type]/[new version]/post_process.py
+```
+⇒ /data1/data/result/[analysis type]/[new version]/summarized.xlsx が作成される。
 </details>
 
 ## 5\. 現行バージョンでの解析（必要に応じて実施）
@@ -170,7 +174,7 @@ singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/r
 #### 5-1\. 解析の準備
 検証用の解析フォルダの下に、現行バージョンの解析フォルダをFastqを含めて作成する。\
 &nbsp;&nbsp;&nbsp;&nbsp; CAPサーバ： /data1/data/result/[analysis type]/Validation/[new version]/[current version] \
-&nbsp;&nbsp;&nbsp;&nbsp; 開発サーバ： /data1/data/result/[analysis type]/[new version]/[current version]
+&nbsp;&nbsp;&nbsp;&nbsp; 開発サーバ： /data1/data/result/[analysis type]/[new version]/[current version] \
 CAPサーバの場合:
 ```
 mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/Fastq
@@ -182,8 +186,7 @@ mkdir -p /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq
 #### 5-2\. fastq.gzのシンボリックリンクを作成する。
 リンク元のファイルは 1-1.で確認したものを使用。リンクの作成コマンドは 1-2.を参照。
 #### 5-3\. 解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
-1検体毎にrun.shを作成した場合、解析の実行も1検体毎に実施することになるので、\
-複数の検体の実行コマンドをまとめて1つの run.sh を作成しても構いません。\
+1検体毎にrun.shを作成した場合、解析の実行も1検体毎に実施することになるので、複数の検体の実行コマンドをまとめて1つの run.sh を作成しても構いません。\
 CAPサーバの場合:
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/run.sh
@@ -223,7 +226,12 @@ cd /data1/data/result/[analysis type]/[new version]/[current version]/[sample ID
 ```
 singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/result/[analysis type]/Validation/[new version]/[current version]/post_process.py
 ```
-⇒ /data1/data/result/[analysis type]/Validation/[new version]/[current version]/summarized.xlsx が作成される。
+⇒ /data1/data/result/[analysis type]/Validation/[new version]/[current version]/summarized.xlsx が作成される。\
+開発サーバの場合:
+```
+singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/result/[analysis type]/[new version]/[current version]/post_process.py
+```
+⇒ /data1/data/result/[analysis type]/[new version]/[current version]/summarized.xlsx が作成される。\
 **変更したスクリプトファイルは必ず元に戻しておくこと。**
 </details>
 
@@ -236,8 +244,7 @@ TS,LDの承認を得て検証の合格が確定したら、パイプラインを
   </summary>
 
 #### 6-1\. 新バージョンのPipelineスクリプトの確認
-パイプラインフォルダの直下にある .pipeline ファイルに記載のバージョンが、アップデート後のバージョンであることを確認する。
-（この値がレポート最終頁のパイプラインバージョンに反映されます）
+パイプラインフォルダの直下にある .pipeline ファイルに記載のバージョンが、アップデート後のバージョンであることを確認する。（この値がレポート最終頁のパイプラインバージョンに反映されます）
 ```
 $ cat /data1/GxD_eWES/versions/[new version]/.pipeline
 VERSION=[new version]
@@ -249,6 +256,5 @@ rm /data1/GxD_[analysis type]/Pipeline
 ln -s /data1/GxD_[analysis type]/versions/[new version] /data1/GxD_[analysis type]/Pipeline
 ```
 #### 6-3\. データベースに登録されているバージョン情報の更新
-OncoStationで作成されるPDFファイル(=レポートシステムにuploadされる報告書)の「Additional Information」項目が新Pipelineの情報と一致するよう、
-データベースに登録されているレポートバージョンの更新をGSからITチームに指示するよう依頼する。(変更がない場合は依頼しなくてよいです)
+OncoStationで作成されるPDFファイル(=レポートシステムにuploadされる報告書)の「Additional Information」項目が新Pipelineの情報と一致するよう、データベースに登録されているレポートバージョンの更新をGSからITチームに指示するよう依頼する。(変更がない場合は依頼しなくてよいです)
 </details>
