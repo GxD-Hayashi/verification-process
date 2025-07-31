@@ -31,6 +31,7 @@
 rsync -avzru gxd_pipeline@192.168.9.100:/data1/data/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 rsync -avzru gxd_pipeline@192.168.9.100:/data2/backup/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 ```
+
 <a id="1-2"></a>
 #### 1-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。
 WTSの場合は、リンクファイル名と元ファイル名は同じ。\
