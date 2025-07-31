@@ -19,7 +19,6 @@
     Detail
   </summary>
 
-<a id="1-1"></a>
 #### 1-1\. sshクライアントからgxd_pipelineユーザーでログインし、検証に使用する検体のfastq.gzの存在を確認する。
 <img src="https://github.com/user-attachments/assets/fec5ee81-0350-4e41-8d55-316b051762c6" width="500"> \
 ① batch name ② sample ID \
@@ -31,8 +30,6 @@
 rsync -avzru gxd_pipeline@192.168.9.100:/data1/data/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 rsync -avzru gxd_pipeline@192.168.9.100:/data2/backup/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 ```
-
-<a id="1-2"></a>
 #### 1-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。
 WTSの場合は、リンクファイル名と元ファイル名は同じ。\
 CAPサーバの場合:
@@ -187,7 +184,7 @@ mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[current ve
 mkdir -p /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq
 ```
 #### 5-2\. fastq.gzのシンボリックリンクを作成する。
-リンク元のファイルは [1-1](#1-1).で確認したものを使用。リンクの作成コマンドは [1-2](#1-2).を参照。
+リンク元のファイルは 1-1.で確認したものを使用。リンクの作成コマンドは 1-2.を参照。
 #### 5-3\. 解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
 1検体毎にrun.shを作成した場合、解析の実行も1検体毎に実施することになるので、複数の検体の実行コマンドをまとめて1つの run.sh を作成しても構いません。\
 CAPサーバの場合:
