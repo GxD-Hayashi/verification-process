@@ -1,10 +1,10 @@
 # 検証手順
 ## 0\. 検証計画時の注意点
  - OncoStationに未登録の検体を使用するとPDFレポートの作成ができません。（rule: report_json 実行時、DBにアクセスして検体情報を検索する際に、登録情報がなくエラー終了するため）
- - 開発サーバーで解析を行うと、API通信制限のためか、PDFが作成されないことがあります。（すべての検体で起こるわけではありません）
- - 開発サーバーで検証する際は、臨床検体を使用せず、標準物質またはCAP PT検体等を使用すること。（セキュリティ面で安全が担保できていません）
+ - 開発サーバで解析を行うと、API通信制限のためか、PDFが作成されないことがあります。（すべての検体で起こるわけではありません）
+ - 開発サーバで検証する際は、臨床検体を使用せず、標準物質またはCAP PT検体等を使用すること。（セキュリティ面で安全が担保できていません）
  - 検証スクリプトのダウンロード(git clone)や解析の実行は **gxd_pipeline ユーザーで実施**してください。fastq.gz のコピーやbashファイルの作成等は他のユーザーでも問題ないですが、gxd_pipelineユーザーに閲覧・実行権限を付与しておいてください。
- - CAPサーバーでの検証は、やむを得ない場合を除き、**現行のパイプラインが稼働しているときには行わない**こと。**改修内容によっては仕様と異なるリファレンスファイルを参照するので**、想定した検証ができない可能性があります。
+ - CAPサーバでの検証は、やむを得ない場合を除き、**現行のパイプラインが稼働しているときには行わない**こと。**改修内容によっては仕様と異なるリファレンスファイルを参照してしまうので**、想定した検証ができない可能性があります。
  - レポートの「Additional Information」項目のバージョン値は以下の値が反映されます。\
 &ensp;&ensp; Pipeline: スクリプトファイルに固定値として記載されている値\
 &ensp;&ensp; OncoStation: データベースの report_version テーブルの値\
@@ -19,17 +19,19 @@
     Detail
   </summary>
 
+<a id="1-1"></a>
 #### 1-1\. sshクライアントからgxd_pipelineユーザーでログインし、検証に使用する検体のfastq.gzの存在を確認する。
 <img src="https://github.com/user-attachments/assets/fec5ee81-0350-4e41-8d55-316b051762c6" width="500"> \
 ① batch name ② sample ID \
 ファイルがない場合は、BackUpサーバを確認する。 ※CAPサーバのみ \
 <img src="https://github.com/user-attachments/assets/ad7912f6-846e-4877-8722-54549a969045" width="500"> \
 ① batch name ② sample ID \
-ファイルがない場合は、CAPサーバまたはBackUpサーバからコピーする。※開発サーバのみ 
+所定の場所にファイルがない場合は、CAPサーバまたはBackUpサーバからコピーする。※開発サーバのみ 
 ```
 rsync -avzru gxd_pipeline@192.168.9.100:/data1/data/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 rsync -avzru gxd_pipeline@192.168.9.100:/data2/backup/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 ```
+<a id="1-2"></a>
 #### 1-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。
 WTSの場合は、リンクファイル名と元ファイル名は同じ。\
 CAPサーバの場合:
@@ -38,7 +40,7 @@ mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]
 ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/WTS/Validation/[new version]/[sample ID]/Fastq/
 ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/WTS/Validation/[new version]/[sample ID]/Fastq/
 ```
-fastq.gzがBuckUpサーバに異動していた場合:
+fastq.gzがBuckUpサーバに移動していた場合:
 ```
 mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq
 ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/WTS/Validation/[new version]/[sample ID]/Fastq/
@@ -56,7 +58,7 @@ CAPサーバの場合:
 ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/eWES/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
 ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/eWES/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
 ```
-fastq.gzがBuckUpサーバに異動していた場合:
+fastq.gzがBuckUpサーバに移動していた場合:
 ```
 ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/eWES/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R1.fastq.gz
 ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/eWES/Validation/[new version]/[sample ID]/Fastq/[sample ID].tumour.R2.fastq.gz
@@ -75,7 +77,7 @@ vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.s
 source /data1/iGeniPipe/miniconda3/bin/activate cs && 
 snakemake --snakefile /data1/GxD_[analysis type]/versions/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/versions/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]' & 
 ```
-fastq.gzがBuckUpサーバに異動していた場合: \
+fastq.gzがBuckUpサーバに移動していた場合: \
 snakemake 実行時のオプションを追加する。
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
@@ -121,7 +123,7 @@ ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
 </details>
 
 ## 3\. 検証するパイプラインの修正
-初回解析時に作成されたファイルや、データベースに登録済みの解析結果を変更しないよう、コードを一時的に変更する。
+初回解析時に作成されたファイルや、データベースに登録済みの解析結果を変更しないよう、一部のコードを一時的に変更する。
 <details>
   <summary> 
     Detail
@@ -131,7 +133,7 @@ ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
 ※ データベースの更新をしないようにするための処理。\
 <img src="https://github.com/user-attachments/assets/42610d69-97ff-4df7-8e06-9c170c3a7b35" width="400"> 
 #### 3-2\. */[new version]/workflow/configs/files.py の self.report_pdf を修正してPDFレポートの出力先を変更する。（開発サーバのみ）
-※ APIでレポートを作成するとCAPサーバーに出力されるので、上書きしないように任意のファイルパスを指定する。\
+※ API（レポートシステム）でレポートを作成するとCAPサーバに出力されるので、上書きしないように任意のファイルパスを指定する。\
 <img src="https://github.com/user-attachments/assets/4a04bc67-e6af-4b71-8a73-29752132f98e" width="500"> 
 </details>
 
@@ -184,7 +186,7 @@ mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[current ve
 mkdir -p /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq
 ```
 #### 5-2\. fastq.gzのシンボリックリンクを作成する。
-リンク元のファイルは 1-1.で確認したものを使用。リンクの作成コマンドは 1-2.を参照。
+リンク元のファイルは [1-1](#1-1).で確認したものを使用。リンクの作成コマンドは [1-2](#1-2).を参照。
 #### 5-3\. 解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
 1検体毎にrun.shを作成した場合、解析の実行も1検体毎に実施することになるので、複数の検体の実行コマンドをまとめて1つの run.sh を作成しても構いません。\
 CAPサーバの場合:
@@ -193,7 +195,7 @@ vi /data1/data/result/[analysis type]/Validation/[new version]/[current version]
 source /data1/iGeniPipe/miniconda3/bin/activate cs && 
 snakemake --snakefile /data1/GxD_[analysis type]/versions/[current version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/versions/[current version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]/[current version]' & 
 ```
-fastq.gzがBuckUpサーバに異動していた場合: \
+fastq.gzがBuckUpサーバに移動していた場合: \
 snakemake 実行時にオプションを追加する。
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/run.sh
@@ -210,7 +212,7 @@ snakemake --snakefile /data1/GxD_[analysis type]/versions/[current version]/work
 */[current version]/workflow/layer/summarize.smk: report_json rule のuploadオプションをFalseに変更する。\
 ※ データベースの更新をしないようにするための処理。3-1. を参照。\
 */[new version]/workflow/configs/files.py の self.report_pdf を修正してPDFレポートの出力先を変更する。**（開発サーバのみ）**\
-※ APIでレポートを作成するとCAPサーバーに出力されるので、上書きしないように任意のファイルパスを指定する。3-2.を参照。
+※ API（レポートシステム）でレポートを作成するとCAPサーバに出力されるので、上書きしないように任意のファイルパスを指定する。3-2.を参照。
 #### 5-5\. 解析の実行
 CAPサーバの場合:
 ```
