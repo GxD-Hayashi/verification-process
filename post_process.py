@@ -54,8 +54,14 @@ for sample in ewes_sample :
     msi_data = msi_data[['MSI','Result']].drop_duplicates()
     tmb_data = tmb_data[['TMB','TMB_STATUS']].drop_duplicates()
     cnv_data = cnv_data[ cnv_data['FILTER']=='PASS' ][['Gene_name','TYPE','ONCOKB_ONCOGENICITY','gene.mean.CN']].drop_duplicates().sort_values('Gene_name')
-    if cnv_data.shape[0] == 0 : cnv_data = None
 
+    msi_data.insert(0, 'sample_id', sample_id)
+    tmb_data.insert(0, 'sample_id', sample_id)
+    if cnv_data.shape[0] > 0 :
+        cnv_data.insert(0, 'sample_id', sample_id)
+    else :
+        cnv_data = None
+    
     target_data = target_data.infer_objects(copy=False).fillna(np.nan).replace([np.nan], [None])
     target_data = target_data[['SYMBOL','HGVSc','HGVSp','AF','Clinvar_CLNSIG','ONCOKB_ONCOGENICITY']].drop_duplicates()
     target_data["HGVSc"] = target_data["HGVSc"].str.split(":", expand=True)[1]
@@ -82,7 +88,7 @@ for sample in wts_sample :
     splice_file = os.path.join(sample, 'Summary', sample_id + '.summarized.splice.tsv')
 
     if os.path.isfile(fusion_file) :
-        fs_data = pd.read_csv(fs_file, sep="\t")
+        fs_data = pd.read_csv(fusion_file, sep="\t")
         fs_data = fs_data[['gene1','gene2','chr1','breakpoint_1','chr2','breakpoint_2','max_split_cnt','max_span_cnt']].drop_duplicates().sort_values('gene1').reset_index(drop=True)
         fs_data.insert(0, 'sample_id', sample_id)
     else :
@@ -90,7 +96,7 @@ for sample in wts_sample :
         fs_data = None
 
     if os.path.isfile(splice_file) :
-        sp_data = pd.read_csv(sp_file, sep="\t")
+        sp_data = pd.read_csv(splice_file, sep="\t")
         sp_data = sp_data[ sp_data['FILTER'] == 'PASS' ][['spliceName','discordant_mates','canonical_reads','ratio','tpm_total','tpm_variant']].drop_duplicates()
         sp_data.insert(0, 'sample_id', sample_id)
     else :
