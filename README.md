@@ -22,12 +22,11 @@
 #### 1-1\. sshクライアントからgxd_pipelineユーザーでログインし、検証に使用する検体のfastq.gzの存在を確認する。
 <img src="https://github.com/user-attachments/assets/fec5ee81-0350-4e41-8d55-316b051762c6" width="500"> \
 ① batch name ② sample ID \
-ファイルがない場合は、BackUpサーバを確認する。 ※CAPサーバのみ \
+ファイルがない場合は、BackUpサーバを確認する。\
 <img src="https://github.com/user-attachments/assets/ad7912f6-846e-4877-8722-54549a969045" width="500"> \
 ① batch name ② sample ID \
-所定の場所にファイルがない場合は、CAPサーバまたはBackUpサーバからコピーする。※開発サーバのみ 
+所定の場所にファイルがない場合は、BackUpサーバからコピーする。※開発サーバのみ 
 ```
-rsync -avzru gxd_pipeline@192.168.9.100:/data1/data/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 rsync -avzru gxd_pipeline@192.168.9.100:/data2/backup/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 ```
 #### 1-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。
