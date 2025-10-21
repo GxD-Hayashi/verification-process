@@ -77,7 +77,7 @@ source /data1/iGeniPipe/miniconda3/bin/activate cs &&
 snakemake --snakefile /data1/GxD_[analysis type]/versions/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/versions/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]' & 
 ```
 BackUpサーバのFastq.gzを参照している場合: \
-snakemake 実行時のオプションを追加する。
+snakemake 実行時のオプションを追加する。（BackUpサーバのデータを参照できるようにする）
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
 source /data1/iGeniPipe/miniconda3/bin/activate cs && 
@@ -196,7 +196,7 @@ source /data1/iGeniPipe/miniconda3/bin/activate cs &&
 snakemake --snakefile /data1/GxD_[analysis type]/versions/[current version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/versions/[current version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]/[current version]' & 
 ```
 fastq.gzがBuckUpサーバに移動していた場合: \
-snakemake 実行時にオプションを追加する。
+snakemake 実行時にオプションを追加する。（BackUpサーバのデータを参照できるようにする）
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/run.sh
 source /data1/iGeniPipe/miniconda3/bin/activate cs && 
@@ -238,7 +238,7 @@ singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/r
 </details>
 
 ## 6\. パイプラインのアップデート
-TS,LDの承認を得て検証の合格が確定したら、パイプラインをアップデートする。\
+TS,LDの承認を得て検証の合格が確定したら、反映日までにパイプラインをアップデートしておく。\
 **3-1, 3-2, 5-4 で変更したスクリプトファイルを元に戻したことを確認しておくこと。**
 <details>
   <summary> 
