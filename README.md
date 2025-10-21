@@ -25,10 +25,12 @@
 ファイルがない場合は、BackUpサーバを確認する。\
 <img src="https://github.com/user-attachments/assets/ad7912f6-846e-4877-8722-54549a969045" width="500"> \
 ① batch name ② sample ID \
-所定の場所にファイルがない場合は、BackUpサーバからコピーする。※開発サーバのみ 
+所定の場所にファイルがない場合は、BackUpサーバからコピーする。※開発サーバのみ \
+※ BackUpサーバはCAPサーバにマウントされているため、CAPサーバでの検証時はBackUpサーバのFastqに直接リンクを張れます。
 ```
 rsync -avzru gxd_pipeline@192.168.9.100:/data2/backup/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 ```
+
 #### 1-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。
 WTSの場合は、リンクファイル名と元ファイル名は同じ。\
 CAPサーバの場合:
@@ -68,13 +70,13 @@ ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/resu
 
 #### 1-3\. 解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
 1検体毎にrun.shを作成した場合、解析の実行も1検体毎に実施することになるので、複数の検体の実行コマンドをまとめて1つの run.sh を作成しても構いません。\
-CAPサーバの場合:
+CAPサーバのFastq.gzを参照している場合:
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
 source /data1/iGeniPipe/miniconda3/bin/activate cs && 
 snakemake --snakefile /data1/GxD_[analysis type]/versions/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/versions/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]' & 
 ```
-fastq.gzがBuckUpサーバに移動していた場合: \
+BackUpサーバのFastq.gzを参照している場合: \
 snakemake 実行時のオプションを追加する。
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
@@ -100,7 +102,8 @@ snakemake --snakefile /data1/GxD_[analysis type]/versions/[new version]/workflow
 git clone -b dev git@bitbucket.org:geninus/gxd_ewes.git
 git clone -b dev git@bitbucket.org:geninus/gxd_wts.git
 ```
-※ -b dev オプションで dev branch のコードをDLする。main branch の場合はオプション不要 
+※ -b dev オプションで dev branch のコードをDLする。\
+※ dev 以外のbranchで開発されていた場合は、該当するbranch名を指定する。main branch の場合はオプション不要 
 #### 2-2\. パイプラインのソースコード置き場（/data1/GxD_[analysis type]/versions/）の下に移動させてフォルダ名を適宜付与する。
 ```
 mv gxd_ewes /data1/GxD_eWES/versions/[new version]
