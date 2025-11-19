@@ -19,19 +19,19 @@
     Detail
   </summary>
 
-#### 1-1\. sshクライアントからgxd_pipelineユーザーでログインし、検証に使用する検体のfastq.gzの存在を確認する。
+#### 1-1\. sshクライアントからgxd_pipelineユーザーでログインし、検証に使用する検体の fastq.gz の存在を確認する。
 <img src="https://github.com/user-attachments/assets/fec5ee81-0350-4e41-8d55-316b051762c6" width="500"> \
 ① batch name ② sample ID \
-ファイルがない場合は、backup storageを確認する。\
+ファイルがない場合は、backup storage (/data2/backup/NovaseqX/) を確認する。\
 <img src="https://github.com/user-attachments/assets/ad7912f6-846e-4877-8722-54549a969045" width="500"> \
 ① batch name ② sample ID \
-CAP storage (/data1/data/NovaseqX/) にファイルがない場合は、backup storageからコピーする。※開発サーバーのみ \
+/data1/data/NovaseqX/[batch name] にファイルがない場合は、backup storageからコピーする。※開発サーバーのみ 
 ```
 rsync -avzru gxd_pipeline@192.168.9.100:/data2/backup/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 ```
-※ backup storageはCAPサーバーにマウントされているので、CAPサーバーでの検証時はbackup storageのFastqに直接リンクを張って使用する。
+※ backup storageはCAPサーバーにマウントされているので、CAPサーバーでの検証時は backup storage の fastq.gz に直接リンクを張って使用する。
 
-#### 1-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gzのシンボリックリンクを作成する。
+#### 1-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gz のシンボリックリンクを作成する。
 WTSの場合は、リンクファイル名と元ファイル名は同じ。\
 CAPサーバーの場合:
 ```
@@ -43,7 +43,7 @@ fastq.gzが backup storage に移動していた場合:
 ```
 mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/Fastq
 ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R1.fastq.gz /data1/data/result/WTS/Validation/[new version]/[sample ID]/Fastq/
-ln -s /data1/backup/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/WTS/Validation/[new version]/[sample ID]/Fastq/
+ln -s /data2/backup/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/result/WTS/Validation/[new version]/[sample ID]/Fastq/
 ```
 開発サーバーの場合:
 ```
@@ -70,13 +70,13 @@ ln -s /data1/data/NovaseqX/[batch name]/[sample ID].R2.fastq.gz /data1/data/resu
 
 #### 1-3\. 解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
 1検体毎にrun.shを作成した場合、解析の実行も1検体毎に実施することになるので、複数の検体の実行コマンドをまとめて1つの run.sh を作成しても構いません。\
-CAPサーバーのFastq.gzを参照している場合:
+CAPサーバーの .fastq.gzを参照している場合:
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
 source /data1/iGeniPipe/miniconda3/bin/activate cs && 
 snakemake --snakefile /data1/GxD_[analysis type]/versions/[new version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/versions/[new version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]' & 
 ```
-backup storage のFastq.gzを参照している場合: \
+backup storage の .fastq.gz を参照している場合: \
 snakemake 実行時のオプションを追加して backup storage のデータを参照できるようにする。
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[sample ID]/run.sh
@@ -183,7 +183,7 @@ mkdir -p /data1/data/result/[analysis type]/Validation/[new version]/[current ve
 ```
 mkdir -p /data1/data/result/[analysis type]/[new version]/[sample ID]/Fastq
 ```
-#### 5-2\. fastq.gzのシンボリックリンクを作成する。
+#### 5-2\. fastq.gz のシンボリックリンクを作成する。
 リンク元のファイルは 1-1.で確認したものを使用。リンクの作成コマンドは 1-2.を参照。
 #### 5-3\. 解析ディレクトリの直下にrun.shを作成、解析実行コマンドを記載する。
 1検体毎にrun.shを作成した場合、解析の実行も1検体毎に実施することになるので、複数の検体の実行コマンドをまとめて1つの run.sh を作成しても構いません。\
@@ -193,7 +193,7 @@ vi /data1/data/result/[analysis type]/Validation/[new version]/[current version]
 source /data1/iGeniPipe/miniconda3/bin/activate cs && 
 snakemake --snakefile /data1/GxD_[analysis type]/versions/[current version]/workflow/Snakefile --directory /data1/GxD --profile /data1/GxD_[analysis type]/versions/[current version]/profiles/all.q --config patient_id='[sample ID]' output_dir='/data1/data/result/[analysis type]/Validation/[new version]/[current version]' & 
 ```
-fastq.gzが backup storage に移動していた場合: \
+fastq.gz が backup storage に移動していた場合: \
 snakemake 実行時にオプションを追加する。（backup storageのデータを参照できるようにする）
 ```
 vi /data1/data/result/[analysis type]/Validation/[new version]/[current version]/[sample ID]/run.sh
