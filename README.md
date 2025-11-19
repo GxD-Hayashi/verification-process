@@ -153,16 +153,14 @@ cd /data1/data/result/[analysis type]/[new version]/[sample ID] && run.sh
 ```
 ### 4-2\. 解析結果をまとめる
 全ての検体で解析完了が確認できたら、解析結果をまとめて1つのExcelファイルに書き出す。\
-同じ階層にあるサンプル毎の解析フォルダにアクセスし、summarized.*.tsv を読み込んで集約するスクリプト post_process.py を検証フォルダにコピーし、実行する。
+サンプル毎の解析フォルダにアクセスし、summarized.*.tsv を読み込んで集約するスクリプト post_process.py を利用する。
 ```
-singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/result/[analysis type]/Validation/[new version]/post_process.py
+singularity exec --bind /data1 /data1/labTools/labTools.sif python post_process.py -d [analysis dirpath] -o [outputfile.xlsx]
 ```
-⇒ /data1/data/result/[analysis type]/Validation/[new version]/summarized.xlsx が作成される。\
 開発サーバーの場合
 ```
-singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/result/[analysis type]/[new version]/post_process.py
+singularity exec --bind /data1 /data1/labTools/labTools.sif python post_process.py -d [analysis dirpath] -o [outputfile.xlsx]
 ```
-⇒ /data1/data/result/[analysis type]/[new version]/summarized.xlsx が作成される。
 </details>
 
 ## 5\. 現行バージョンでの解析（必要に応じて実施）
@@ -224,16 +222,14 @@ cd /data1/data/result/[analysis type]/[new version]/[current version]/[sample ID
 ```
 ### 5-6\. 解析結果をまとめる
 全ての検体で解析完了が確認できたら、解析結果をまとめて1つのExcelファイルに書き出す。\
-同じ階層にあるサンプル毎の解析フォルダにアクセスし、summarized.*.tsv を読み込んで集約するスクリプト post_process.py を検証フォルダにコピーし、実行する。
+サンプル毎の解析フォルダにアクセスし、summarized.*.tsv を読み込んで集約するスクリプト post_process.py を利用する。
 ```
-singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/result/[analysis type]/Validation/[new version]/[current version]/post_process.py
+singularity exec --bind /data1 /data1/labTools/labTools.sif python post_process.py -d [analysis dirpath] -o [outputfile.xlsx]
 ```
-⇒ /data1/data/result/[analysis type]/Validation/[new version]/[current version]/summarized.xlsx が作成される。\
 開発サーバーの場合:
 ```
-singularity exec --bind /data1 /data1/labTools/labTools.sif python /data1/data/result/[analysis type]/[new version]/[current version]/post_process.py
+singularity exec --bind /data1 /data1/labTools/labTools.sif python post_process.py -d [analysis dirpath] -o [outputfile.xlsx]
 ```
-⇒ /data1/data/result/[analysis type]/[new version]/[current version]/summarized.xlsx が作成される。\
 **変更したスクリプトファイルは必ず元に戻しておくこと。**
 </details>
 
