@@ -92,7 +92,7 @@ snakemake --snakefile /data1/GxD_[analysis type]/versions/[new version]/workflow
 ```
 </details>
 
-## 2\. 検証するパイプラインのインストール
+## 2\. 検証するパイプライン等のインストール
 <details>
   <summary> 
     Detail
@@ -121,6 +121,12 @@ rm -rf /data1/GxD_WTS/versions/[new version]/containers
 ln -s /data1/GxD_eWES/containers /data1/GxD_eWES/versions/[new version]/
 ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
 ```
+#### 2-5\. データベースを更新する場合
+開発チームの指示に従って以下の場所に新しいDBデータを既定のファイル名で格納する。\
+【eWES】/data1/GxD_eWES/reference/anno_db\
+【WTS】/data1/GxD_WTS/references/01.Human/oncoKB\
+
+
 </details>
 
 ## 3\. 検証するパイプラインの修正
