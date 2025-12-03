@@ -126,6 +126,7 @@ ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
 【eWES】/data1/GxD_eWES/reference/anno_db\
 【WTS】/data1/GxD_WTS/references/01.Human/oncoKB
 
+**リファレンスにも変更がある場合は、開発チームの指示に従って、リファレンスデータを既定のファイル名で格納する。**
 </details>
 
 ## 3\. 検証するパイプラインの修正
