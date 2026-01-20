@@ -104,7 +104,8 @@ git clone -b dev git@bitbucket.org:geninus/gxd_ewes.git
 git clone -b dev git@bitbucket.org:geninus/gxd_wts.git
 ```
 ※ -b dev オプションで dev branch のコードをDLする。\
-※ dev 以外のbranchで開発されていた場合は、該当するbranch名を指定する。main branch の場合はオプション不要。
+※ dev 以外のbranchで開発されていた場合は、該当するbranch名を指定する。main branch の場合はオプション不要。\
+※ git clone コマンドが使えない場合はローカルPCにzipをインストールし、サーバーにコピーして解凍する。
 #### 2-2\. パイプラインのソースコード置き場（/data1/GxD_[analysis type]/versions/）の下に移動させてフォルダ名を適宜付与する。
 ```
 mv gxd_ewes /data1/GxD_eWES/versions/[new version]
