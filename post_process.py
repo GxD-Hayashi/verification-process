@@ -60,7 +60,7 @@ def run_summary(args):
         init("No inspection result data exists.")
 
     target_merge, cnv_merge, msi_merge, tmb_merge = None, None, None, None
-    fusion_merge, splice_merge = None, None
+    fusion_merge, splice_merge, fusion_pre_merge = None, None, None
 
     for sample in ewes_sample :
 
@@ -119,6 +119,7 @@ def run_summary(args):
         sample_id = os.path.basename(sample)
         fusion_file = os.path.join(sample, 'Summary', sample_id + '.summarized.fusion.tsv')
         splice_file = os.path.join(sample, 'Summary', sample_id + '.summarized.splice.tsv')
+        fusion_file_pre = os.path.join(sample, 'Fusion', 'Metafusion', 'final.n2.cluster.CANCER_FUSIONS')
 
         if os.path.isfile(fusion_file) :
             fs_data = pd.read_csv(fusion_file, sep="\t")
@@ -136,10 +137,24 @@ def run_summary(args):
             print('splice summary file not created: ' + sample_id)
             sp_data = None
 
+        if os.path.isfile(fusion_file_pre) and os.path.getsize(fusion_file_pre) > 0:
+            fs_data_pre = pd.read_csv(fusion_file_pre, sep="\t")
+            if fs_data_pre.shape[0] > 0 :
+                fs_data_pre = fs_data_pre.rename(columns={'#gene1':'gene1'})
+                fs_data_pre = fs_data_pre[['gene1','gene2','chr1','breakpoint_1','chr2','breakpoint_2','max_split_cnt','max_span_cnt']].drop_duplicates().sort_values('gene1').reset_index(drop=True)
+                fs_data_pre.insert(0, 'sample_id', sample_id)
+            else :
+                fs_data_pre = None
+        else:
+            print('fusion preFilter file not created: ' + sample_id)
+            fs_data_pre = None
+
         fusion_merge = merge_stat(fusion_merge, fs_data)
         splice_merge = merge_stat(splice_merge, sp_data)
+        fusion_pre_merge = merge_stat(fusion_pre_merge, fs_data_pre)
 
     output_sheet(out_file, fusion_merge, "WTS.fusion")
+    output_sheet(out_file, fusion_pre_merge, "WTS.fusion.pre")
     output_sheet(out_file, splice_merge, "WTS.splice")
 
 if __name__ == "__main__":
