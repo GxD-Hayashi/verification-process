@@ -9,6 +9,8 @@ from openpyxl import load_workbook
 
 VERSION="v1.0.0"
 
+use_columns_ewes = ['CHROM','POS','REF','ALT','AF','DP','Consequence','SYMBOL','Gene','Feature','HGVSc','HGVSp','Clinvar_CLNSIG','ONCOKB_ONCOGENICITY','ONCOKB_VARIANT_KEY','FILTER_DEPTH','FILTER_ALT_DEPTH','FILTER_VAF','FILTER_AF_gnomADg','FILTER_AF_gnomADe','FILTER_AF_tommo','FILTER_NONCODING','FILTER_SPLICING','FILTER_SYNONYMOUS','FILTER_BLACKLIST','FILTER']
+
 def main():
 
     if '--help' in sys.argv or '-h' in sys.argv:
@@ -41,6 +43,24 @@ def init(msg="") :
     print(msg)
     sys.exit(1)
 
+def apply_filter(df:pd.DataFrame) -> pd.DataFrame:
+
+    df["FILTER"] = "FAIL"
+    df.loc[
+      (df["FILTER_DEPTH"] == "PASS") &
+      (df["FILTER_ALT_DEPTH"] == "PASS") &
+      (df["FILTER_VAF"] == "PASS") &
+      (df["FILTER_AF_gnomADg"] == "PASS") &
+      (df["FILTER_AF_gnomADe"] == "PASS") &
+      (df["FILTER_AF_tommo"] == "PASS") &
+      (df["FILTER_NONCODING"] == "PASS") &
+      # (df["FILTER_SPLICING"] == "PASS") &
+      ((df["FILTER_SYNONYMOUS"] == "PASS") | ((df["FILTER_SYNONYMOUS"] == "FAIL") & (df["FILTER_SPLICING"] == "FAIL"))) &
+      (df["FILTER_BLACKLIST"] == "PASS") &
+      True, "FILTER"] = "PASS"
+
+    return df
+
 def run_summary(args):
 
     if args.directory is None :
@@ -59,29 +79,33 @@ def run_summary(args):
     if len(ewes_sample) == 0 and len(wts_sample) == 0 :
         init("No inspection result data exists.")
 
-    target_merge, cnv_merge, msi_merge, tmb_merge = None, None, None, None
+    target_merge, cnv_merge, msi_merge, tmb_merge, target_pre_merge = None, None, None, None, None
     fusion_merge, splice_merge, fusion_pre_merge = None, None, None
 
     for sample in ewes_sample :
 
         sample_id = os.path.basename(sample)
-        cnv_file = os.path.join( sample, 'Summary', sample_id + '.summarized.cnv.exome.tsv')
-        msi_file = os.path.join( sample, 'Summary', sample_id + '.summarized.msi.exome.tsv')
-        tmb_file = os.path.join( sample, 'Summary', sample_id + '.summarized.tmb.exome.tsv')
+        cnv_file = os.path.join(sample, 'Summary', sample_id + '.summarized.cnv.exome.tsv')
+        msi_file = os.path.join(sample, 'Summary', sample_id + '.summarized.msi.exome.tsv')
+        tmb_file = os.path.join(sample, 'Summary', sample_id + '.summarized.tmb.exome.tsv')
         target_file = os.path.join(sample, 'Summary', sample_id + '.summarized.snv.target.tsv')
+        target_ori_file = os.path.join(sample, 'Summary', sample_id + '.summarized.snv.target.original.tsv')
+        target_pre_file = os.path.join(sample, 'SNV', 'somatic', sample_id + '.target.snv.marked.tsv')
 
         f_flag = False
-        for f_path in [cnv_file, msi_file, tmb_file, target_file] :
+        for f_path in [cnv_file, msi_file, tmb_file, target_file, target_pre_file] :
             if not os.path.isfile(f_path) : f_flag = True
-
         if f_flag :
             print('Summary file not created: ' + sample_id)
             continue
+
+        if os.path.isfile(target_ori_file): target_file = target_ori_file
 
         cnv_data = pd.read_csv(cnv_file,sep="\t")
         msi_data = pd.read_csv(msi_file,sep="\t")
         tmb_data = pd.read_csv(tmb_file,sep="\t")
         target_data = pd.read_csv(target_file,sep="\t", low_memory=False, dtype=str)
+        target_pre_data = pd.read_csv(target_pre_file,sep="\t", low_memory=False, dtype=str)
 
         msi_data = msi_data[['MSI','Result']].drop_duplicates()
         tmb_data = tmb_data[['TMB','TMB_STATUS']].drop_duplicates()
@@ -100,16 +124,25 @@ def run_summary(args):
         target_data["HGVSc"] = target_data["HGVSc"].str.split(":", expand=True)[1]
         target_data["HGVSp"] = target_data["HGVSp"].str.split(":", expand=True)[1]
         target_data.insert(0, 'sample_id', sample_id)
-        target_data['repo'] = ''
         target_filt = (target_data["Clinvar_CLNSIG"].str.contains("Pathogenic|Likely_pathogenic", case=True, na=False) | target_data["ONCOKB_ONCOGENICITY"].str.contains("oncogenic", case=False, na=False))
         target_data.loc[target_filt, 'Report'] = 'PASS'
+
+        target_pre_data = target_pre_data.infer_objects(copy=False).fillna(np.nan).replace([np.nan], [None])
+        target_pre_data = target_pre_data[use_columns_ewes].drop_duplicates()
+        target_pre_data["HGVSc"] = target_pre_data["HGVSc"].str.split(":", expand=True)[1]
+        target_pre_data["HGVSp"] = target_pre_data["HGVSp"].str.split(":", expand=True)[1]
+        target_pre_data.insert(0, 'sample_id', sample_id)
+        target_pre_data = apply_filter(target_pre_data)
+        target_pre_data['Report'] = (((target_pre_data["Clinvar_CLNSIG"].str.contains("Pathogenic|Likely_pathogenic", case=True, na=False) | target_pre_data["ONCOKB_ONCOGENICITY"].str.contains("oncogenic", case=False, na=False)) & (target_pre_data['FILTER']=='PASS'))).map({True: "PASS", False: ""})
 
         cnv_merge = merge_stat(cnv_merge, cnv_data)
         msi_merge = merge_stat(msi_merge, msi_data)
         tmb_merge = merge_stat(tmb_merge, tmb_data)
         target_merge = merge_stat(target_merge, target_data)
+        target_pre_merge = merge_stat(target_pre_merge, target_pre_data)
 
     output_sheet(out_file, target_merge, "eWES.snv.target")
+    output_sheet(out_file, target_pre_merge, "eWES.snv.target.pre")
     output_sheet(out_file, cnv_merge, "eWES.cnv")
     output_sheet(out_file, msi_merge, "eWES.msi")
     output_sheet(out_file, tmb_merge, "eWES.tmb")
@@ -145,7 +178,7 @@ def run_summary(args):
                 fs_data_pre.insert(0, 'sample_id', sample_id)
             else :
                 fs_data_pre = None
-        else:
+        else :
             print('fusion preFilter file not created: ' + sample_id)
             fs_data_pre = None
 
