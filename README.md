@@ -21,17 +21,20 @@
   </summary>
 
 #### 1-1\. sshクライアントからgxd_pipelineユーザーでログインし、検証に使用する検体の fastq.gz の存在を確認する。
-<img src="https://github.com/user-attachments/assets/fec5ee81-0350-4e41-8d55-316b051762c6" width="500"> \
-① batch name ② sample ID \
-ファイルがない場合は、backup storage (/data2/backup/NovaseqX/) を確認する。\
+2026年以降にシーケンスを実施した検体のfasatq.gz は CAP storage(/data1/data/NovaseqX/)に保存されています。\
+<img src="https://github.com/user-attachments/assets/cbd047ab-0d75-4d0f-9076-3748e198e3eb" width="500"> \
+① batch name ② sample ID
+
+2024～2025年にシーケンスを実施した検体のfasatq.gz は backup storage (/data2/backup/NovaseqX/)に保存されています。\
 <img src="https://github.com/user-attachments/assets/ad7912f6-846e-4877-8722-54549a969045" width="500"> \
 ① batch name ② sample ID \
-/data1/data/NovaseqX/[batch name] にファイルがない場合は、backup storageからコピーする。※開発サーバーのみ 
+backup storage はCAPサーバーにマウントされているので、CAPサーバーでの検証時は backup storage の fastq.gz に直接リンクを張って使用できます。
+
+**※開発サーバーで検証を行う場合**\
+/data1/data/NovaseqX/[batch name] にファイルがない場合は、backup storageからコピーする。
 ```
 rsync -avzru gxd_pipeline@192.168.9.100:/data2/backup/NovaseqX/[batch name]/[sample ID].R*.fastq.gz /data1/data/NovaseqX/[batch name]/
 ```
-※ backup storageはCAPサーバーにマウントされているので、CAPサーバーでの検証時は backup storage の fastq.gz に直接リンクを張って使用する。
-
 #### 1-2\. Fastqフォルダを含む解析ディレクトリを作成し、fastq.gz のシンボリックリンクを作成する。
 WTSの場合は、リンクファイル名と元ファイル名は同じ。\
 CAPサーバーの場合:
