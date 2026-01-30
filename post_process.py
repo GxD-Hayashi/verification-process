@@ -79,7 +79,7 @@ def run_summary(args):
     if len(ewes_sample) == 0 and len(wts_sample) == 0 :
         init("No inspection result data exists.")
 
-    target_merge, cnv_merge, msi_merge, tmb_merge, target_pre_merge = None, None, None, None, None
+    target_merge, exome_merge, cnv_merge, msi_merge, tmb_merge, target_pre_merge = None, None, None, None, None, None
     fusion_merge, splice_merge, fusion_pre_merge = None, None, None
 
     for sample in ewes_sample :
@@ -90,10 +90,11 @@ def run_summary(args):
         tmb_file = os.path.join(sample, 'Summary', sample_id + '.summarized.tmb.exome.tsv')
         target_file = os.path.join(sample, 'Summary', sample_id + '.summarized.snv.target.tsv')
         target_ori_file = os.path.join(sample, 'Summary', sample_id + '.summarized.snv.target.original.tsv')
+        exome_file = os.path.join(sample, 'Summary', sample_id + '.summarized.snv.exome.tsv')
         target_pre_file = os.path.join(sample, 'SNV', 'somatic', sample_id + '.target.snv.marked.tsv')
 
         f_flag = False
-        for f_path in [cnv_file, msi_file, tmb_file, target_file, target_pre_file] :
+        for f_path in [cnv_file, msi_file, tmb_file, target_file, exome_file, target_pre_file] :
             if not os.path.isfile(f_path) : f_flag = True
         if f_flag :
             print('Summary file not created: ' + sample_id)
@@ -105,6 +106,7 @@ def run_summary(args):
         msi_data = pd.read_csv(msi_file,sep="\t")
         tmb_data = pd.read_csv(tmb_file,sep="\t")
         target_data = pd.read_csv(target_file,sep="\t", low_memory=False, dtype=str)
+        exome_data = pd.read_csv(exome_file,sep="\t", low_memory=False, dtype=str)
         target_pre_data = pd.read_csv(target_pre_file,sep="\t", low_memory=False, dtype=str)
 
         msi_data = msi_data[['MSI','Result']].drop_duplicates()
@@ -118,9 +120,17 @@ def run_summary(args):
             cnv_data.insert(0, 'sample_id', sample_id)
         else :
             cnv_data = None
-    
+
+        exome_data = exome_data.infer_objects(copy=False).fillna(np.nan).replace([np.nan], [None])
+        exome_data = exome_data[['SYMBOL','HGVSc','HGVSp','AF','Clinvar_CLNSIG','ONCOKB_ONCOGENICITY']].drop_duplicates().sort_values('SYMBOL').reset_index(drop=True)
+        exome_data["HGVSc"] = exome_data["HGVSc"].str.split(":", expand=True)[1]
+        exome_data["HGVSp"] = exome_data["HGVSp"].str.split(":", expand=True)[1]
+        exome_data.insert(0, 'sample_id', sample_id)
+        exome_filt = exome_data["Clinvar_CLNSIG"].str.contains("Pathogenic|Likely_pathogenic", case=True, na=False)
+        exome_data.loc[exome_filt, 'Report'] = 'PASS'
+
         target_data = target_data.infer_objects(copy=False).fillna(np.nan).replace([np.nan], [None])
-        target_data = target_data[['SYMBOL','HGVSc','HGVSp','AF','Clinvar_CLNSIG','ONCOKB_ONCOGENICITY']].drop_duplicates()
+        target_data = target_data[['SYMBOL','HGVSc','HGVSp','AF','Clinvar_CLNSIG','ONCOKB_ONCOGENICITY']].drop_duplicates().sort_values('SYMBOL').reset_index(drop=True)
         target_data["HGVSc"] = target_data["HGVSc"].str.split(":", expand=True)[1]
         target_data["HGVSp"] = target_data["HGVSp"].str.split(":", expand=True)[1]
         target_data.insert(0, 'sample_id', sample_id)
@@ -138,11 +148,13 @@ def run_summary(args):
         cnv_merge = merge_stat(cnv_merge, cnv_data)
         msi_merge = merge_stat(msi_merge, msi_data)
         tmb_merge = merge_stat(tmb_merge, tmb_data)
+        exome_merge = merge_stat(exome_merge, exome_data)
         target_merge = merge_stat(target_merge, target_data)
         target_pre_merge = merge_stat(target_pre_merge, target_pre_data)
 
     output_sheet(out_file, target_merge, "eWES.snv.target")
     output_sheet(out_file, target_pre_merge, "eWES.snv.target.pre")
+    output_sheet(out_file, exome_merge, "eWES.snv.exome")
     output_sheet(out_file, cnv_merge, "eWES.cnv")
     output_sheet(out_file, msi_merge, "eWES.msi")
     output_sheet(out_file, tmb_merge, "eWES.tmb")
