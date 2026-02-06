@@ -128,9 +128,11 @@ ln -s /data1/GxD_WTS/containers /data1/GxD_WTS/versions/[new version]/
 #### 2-5\. 新しいDBデータのダウンロード ※データベースを更新する場合のみ
 開発チームの指示に従って、以下の場所に新しいDBデータを既定のファイル名で格納する。\
 【eWES】/data1/GxD_eWES/reference/anno_db\
-【WTS】/data1/GxD_WTS/references/01.Human/oncoKB
+【WTS】/data1/GxD_WTS/references/01.Human
 
-**リファレンスにも変更がある場合は、開発チームの指示に従って、リファレンスデータを既定のファイル名で格納する。**
+リファレンスディレクトリの一部の所有者が root になっており、gxd_pipeline ユーザーに書き込み権限がない場合があります。\
+その場合は sudoコマンドで書き込んでください。\
+**リファレンスにも変更がある場合は、開発チームの指示に従って、リファレンスデータを既定のファイル名で格納してください。**
 </details>
 
 ## 3\. 検証するパイプラインの修正
